@@ -1,46 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
   Link,
-  IconButton,
-  InputAdornment,
-  useTheme,
-  useMediaQuery,
   Alert,
   Paper,
 } from '@mui/material';
-import { signInWithEmailAndPassword, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithPopup, updatePassword } from 'firebase/auth';
-import { auth } from '../services/firebase';
-import { db } from '../services/firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import bgImage from '../../assets/bg-img.png';
-import GoogleIcon from '../assets/google.svg';
-import FacebookIcon from '../assets/facebook.svg';
-import AppleIcon from '../assets/apple.svg';
-import logo from '../../assets/Group_779.png';
-import bgOverlay from '../assets/bg-overlay.png';
-import PasswordPopup from '../components/PasswordPopup';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import ForgotPasswordPopup from '../components/ForgotPasswordPopup';
 
 const Login = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
-  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
-  const [socialLoginUser, setSocialLoginUser] = useState<any>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPasswordPopup, setShowForgotPasswordPopup] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,71 +36,6 @@ const Login = () => {
     } catch (err) {
       setError('Failed to login. Please try again.');
     }
-  };
-
-  const handleSocialLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider | OAuthProvider) => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      // Check if user exists in Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      
-      if (!userDoc.exists()) {
-        // New user - show password popup
-        setSocialLoginUser(user);
-        setShowPasswordPopup(true);
-      } else {
-        // Existing user - proceed to workflows
-        navigate('/workflows');
-      }
-    } catch (error) {
-      setError('Error signing in with social provider');
-    }
-  };
-
-  const handlePasswordSubmit = async (newPassword: string) => {
-    try {
-      if (socialLoginUser) {
-        // Update user's password
-        await updatePassword(socialLoginUser, newPassword);
-        
-        // Store user data in Firestore
-        await setDoc(doc(db, 'users', socialLoginUser.uid), {
-          email: socialLoginUser.email,
-          displayName: socialLoginUser.displayName,
-          photoURL: socialLoginUser.photoURL,
-          createdAt: new Date().toISOString(),
-          provider: socialLoginUser.providerData[0].providerId
-        });
-
-        // Close popup and navigate
-        setShowPasswordPopup(false);
-        setSocialLoginUser(null);
-        navigate('/workflows');
-      }
-    } catch (error) {
-      setError('Error setting password');
-    }
-  };
-
-  const handleGoogleLogin = () => {
-    handleSocialLogin(new GoogleAuthProvider());
-  };
-
-  const handleFacebookLogin = () => {
-    handleSocialLogin(new FacebookAuthProvider());
-  };
-
-  const handleAppleLogin = () => {
-    const provider = new OAuthProvider('apple.com');
-    provider.addScope('email');
-    provider.addScope('name');
-    handleSocialLogin(provider);
-  };
-
-  const handleTogglePassword = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -234,11 +143,8 @@ const Login = () => {
 
           <Box sx={{ textAlign: 'center' }}>
             <Link
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                // Add forgot password logic here
-              }}
+              component="button"
+              onClick={() => setError('Forgot password feature coming soon!')}
               sx={{
                 color: '#666',
                 textDecoration: 'none',

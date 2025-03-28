@@ -24,7 +24,8 @@ const App = () => {
   useEffect(() => {
     // Check authentication status when app loads
     const checkAuth = () => {
-      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      // Just check if the auth exists, we don't need to store it
+      localStorage.getItem('isAuthenticated');
       setIsLoading(false);
     };
 
