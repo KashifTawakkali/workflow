@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import ReactFlow, {
-  Controls,
   Background,
   useNodesState,
   useEdgesState,
@@ -8,7 +7,6 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
-  Position,
   MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -17,21 +15,17 @@ import {
   Box,
   Typography,
   IconButton,
-  useTheme,
-  useMediaQuery,
   Button,
   Dialog,
   TextField,
   DialogContent,
-  DialogTitle,
   Snackbar,
   Alert,
 } from '@mui/material';
 import {
   KeyboardArrowLeft,
-  ContentCopy,
   Close as CloseIcon,
-  Delete as DeleteIcon,
+  ContentCopy,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { saveWorkflow } from '../services/workflowService';
@@ -172,8 +166,6 @@ const nodeTypes = {
 };
 
 const WorkflowBuilder = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const [zoom, setZoom] = useState(100);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -215,7 +207,7 @@ const WorkflowBuilder = () => {
     [setEdges]
   );
 
-  const handleNodeClick = (event: React.MouseEvent, node: Node) => {
+  const handleNodeClick = (_: React.MouseEvent, node: Node) => {
     if (node.type === 'add') {
       setSelectedNode(node);
       setShowNodeSelector(true);
@@ -756,6 +748,98 @@ const WorkflowBuilder = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {selectedNode && (
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 24,
+            top: 24,
+            width: '320px',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.15)',
+            p: 3
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography sx={{ fontSize: '16px', fontWeight: 600, color: '#333' }}>
+              Node Details
+            </Typography>
+            <IconButton
+              onClick={() => setSelectedNode(null)}
+              sx={{ color: '#666', p: 0.5 }}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          {selectedNode.type === 'default' && executionHistory[selectedNode.id] && (
+            <Box sx={{ mt: 2 }}>
+              <Typography sx={{ fontSize: '14px', fontWeight: 500, color: '#333', mb: 1 }}>
+                Execution History
+              </Typography>
+              {executionHistory[selectedNode.id].map((execution, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    mb: index !== executionHistory[selectedNode.id].length - 1 ? 2 : 0,
+                    p: 1.5,
+                    borderRadius: '6px',
+                    backgroundColor: '#FAFAFA',
+                    border: '1px solid #E5E5E5'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: execution.status === 'passed' ? '#4CAF50' : '#F44336'
+                    }}
+                  />
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontSize: '13px', color: '#333', mb: 0.5 }}>
+                      {execution.timestamp}
+                    </Typography>
+                    <Typography sx={{ fontSize: '12px', color: '#666' }}>
+                      {execution.method} {execution.url}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        JSON.stringify({
+                          method: execution.method,
+                          url: execution.url,
+                          headers: execution.headers,
+                          body: execution.body,
+                          response: execution.response,
+                          error: execution.error
+                        }, null, 2)
+                      );
+                    }}
+                    sx={{
+                      p: 0.5,
+                      color: '#666',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: '#333'
+                      }
+                    }}
+                  >
+                    <ContentCopy fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      )}
     </Box>
   );
 };

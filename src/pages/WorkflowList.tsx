@@ -14,11 +14,6 @@ import {
   TableRow,
   Paper,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  useTheme,
-  useMediaQuery,
   Menu,
   MenuItem,
   InputAdornment,
@@ -28,20 +23,13 @@ import {
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  Star as StarIcon,
-  StarBorder as StarBorderIcon,
   MoreVert as MoreVertIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  Add as AddIcon,
-  KeyboardArrowDown,
   ExpandMore,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   PushPin as PinIcon,
-  Edit as EditIcon,
-  PlayArrow as PlayArrowIcon,
   ContentCopy,
-  Settings as SettingsIcon,
+  KeyboardArrowDown,
 } from '@mui/icons-material';
 import Pagination from '../components/Pagination';
 import { useNavigate } from 'react-router-dom';
@@ -67,9 +55,6 @@ interface ExtendedWorkflow extends Workflow {
 }
 
 const WorkflowList = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState('');

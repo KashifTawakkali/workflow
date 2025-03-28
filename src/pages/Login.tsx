@@ -28,10 +28,9 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ForgotPasswordPopup from '../components/ForgotPasswordPopup';
 
 const Login = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);

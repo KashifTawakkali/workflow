@@ -1,13 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
-  DialogContent,
   Box,
   Typography,
   TextField,
-  IconButton,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
 
 interface EmailConfigProps {
   open: boolean;
@@ -16,6 +13,29 @@ interface EmailConfigProps {
 }
 
 const EmailConfig: React.FC<EmailConfigProps> = ({ open, onClose, nodeId }) => {
+  const [config, setConfig] = useState({
+    to: '',
+    subject: '',
+    body: ''
+  });
+
+  // Load saved configuration for this node if it exists
+  useEffect(() => {
+    const savedConfig = localStorage.getItem(`email-config-${nodeId}`);
+    if (savedConfig) {
+      try {
+        setConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error('Error loading saved configuration:', e);
+      }
+    }
+  }, [nodeId]);
+
+  // Save configuration when it changes
+  useEffect(() => {
+    localStorage.setItem(`email-config-${nodeId}`, JSON.stringify(config));
+  }, [config, nodeId]);
+
   return (
     <Dialog
       open={open}
@@ -24,45 +44,56 @@ const EmailConfig: React.FC<EmailConfigProps> = ({ open, onClose, nodeId }) => {
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '8px',
-          maxWidth: '600px'
+          borderRadius: '12px',
+          width: { xs: '90%', sm: '480px' },
+          p: 0,
+          m: { xs: 2, sm: 0 }
         }
       }}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        p: 3,
-        borderBottom: '1px solid #E5E5E5'
-      }}>
-        <Typography variant="h6" sx={{ fontSize: '18px', fontWeight: 500 }}>
-          Configuration
-        </Typography>
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </Box>
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          <Box>
+            <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
+              To
+            </Typography>
+            <TextField
+              fullWidth
+              value={config.to}
+              onChange={(e) => setConfig({ ...config, to: e.target.value })}
+              placeholder="Enter email addresses"
+              size="small"
+            />
+          </Box>
 
-      <DialogContent sx={{ p: 3 }}>
-        <Box sx={{ mb: 3 }}>
-          <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
-            Email
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Type here.."
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: '#E5E5E5',
-                },
-              },
-            }}
-          />
+          <Box>
+            <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
+              Subject
+            </Typography>
+            <TextField
+              fullWidth
+              value={config.subject}
+              onChange={(e) => setConfig({ ...config, subject: e.target.value })}
+              placeholder="Enter subject"
+              size="small"
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
+              Body
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              value={config.body}
+              onChange={(e) => setConfig({ ...config, body: e.target.value })}
+              placeholder="Enter email body"
+            />
+          </Box>
         </Box>
-      </DialogContent>
+      </Box>
     </Dialog>
   );
 };

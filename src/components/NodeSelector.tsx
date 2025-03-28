@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
+import { Button, Dialog, DialogContent, Grid } from '@mui/material';
 import { Api, Email, TextFields } from '@mui/icons-material';
 
 interface NodeSelectorProps {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   Box,
@@ -44,6 +44,23 @@ const ApiCallConfig: React.FC<ApiCallConfigProps> = ({ open, onClose, nodeId, on
     message: '',
     severity: 'success'
   });
+
+  // Load saved configuration for this node if it exists
+  useEffect(() => {
+    const savedConfig = localStorage.getItem(`api-config-${nodeId}`);
+    if (savedConfig) {
+      try {
+        setConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error('Error loading saved configuration:', e);
+      }
+    }
+  }, [nodeId]);
+
+  // Save configuration when it changes
+  useEffect(() => {
+    localStorage.setItem(`api-config-${nodeId}`, JSON.stringify(config));
+  }, [config, nodeId]);
 
   const handleExecute = async () => {
     if (!config.url) {
