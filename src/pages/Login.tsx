@@ -12,6 +12,8 @@ import {
   InputAdornment,
   useTheme,
   useMediaQuery,
+  Alert,
+  Paper,
 } from '@mui/material';
 import { signInWithEmailAndPassword, GoogleAuthProvider, FacebookAuthProvider, OAuthProvider, signInWithPopup, updatePassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -42,15 +44,23 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/workflows');
-    } catch (error: any) {
-      if (error.code === 'auth/invalid-credential') {
-        setError('Invalid email or password');
+      // Add your actual authentication logic here
+      // For now, we'll use a simple check
+      if (email === 'admin@example.com' && password === 'password') {
+        // Set authentication status
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('user', JSON.stringify({ email }));
+        
+        // Redirect to workflows page
+        navigate('/workflows');
       } else {
-        setError('An error occurred during login');
+        setError('Invalid email or password');
       }
+    } catch (err) {
+      setError('Failed to login. Please try again.');
     }
   };
 
@@ -123,425 +133,126 @@ const Login = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        width: '100vw',
         display: 'flex',
-        position: 'relative',
-        overflow: { xs: 'auto', md: 'hidden' },
-        margin: 0,
-        padding: 0,
-        flexDirection: { xs: 'column', md: 'row' },
-        '&::before': {
-          content: '""',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `url(${bgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          zIndex: -2,
-        },
-        '&::after': {
-          content: '""',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `url(${bgOverlay})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          zIndex: -1,
-        }
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FDF7F2',
       }}
     >
-      {/* Left side with logo and text */}
-      <Box
+      <Paper
+        elevation={0}
         sx={{
-          flex: { xs: 'none', md: 1 },
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: {
-            xs: '40px 20px',
-            sm: '40px',
-            md: '0 40px',
-            lg: '0 80px'
-          },
-          color: 'white',
-          minHeight: { xs: '40vh', md: '100vh' },
-          textAlign: { xs: 'center', md: 'left' },
+          p: 4,
+          width: '100%',
+          maxWidth: '400px',
+          borderRadius: '12px',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <img 
-          src={logo} 
-          alt="HighBridge" 
-          style={{ 
-            width: '280px', 
-            marginBottom: '48px',
-            maxWidth: '100%',
-            alignSelf: isMobile ? 'center' : 'flex-start'
-          }} 
-        />
-        <Typography 
-          variant="h2" 
-          component="h1" 
-          sx={{ 
-            mb: 2, 
-            fontSize: {
-              xs: '32px',
-              sm: '40px',
-              md: '48px',
-              lg: '52px'
-            },
-            fontWeight: 500,
-            letterSpacing: '-0.5px',
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          Building the Future...
-        </Typography>
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            fontSize: {
-              xs: '16px',
-              sm: '16px',
-              md: '18px'
-            },
-            opacity: 0.9,
-            maxWidth: { xs: '100%', md: '480px' },
-            lineHeight: 1.6,
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </Typography>
-      </Box>
-
-      {/* Right side with login form */}
-      <Box
-        sx={{
-          width: {
-            xs: '100%',
-            sm: '460px'
-          },
-          height: 'auto',
-          minHeight: { xs: 'auto', sm: '768px' },
-          position: { xs: 'relative', md: 'absolute' },
-          top: { xs: 0, md: '50%' },
-          left: { xs: 0, md: '780px' },
-          transform: { xs: 'none', md: 'translateY(-50%)' },
-          backgroundColor: 'white',
-          borderRadius: { xs: 0, sm: '24px' },
-          padding: {
-            xs: '20px',
-            sm: '40px'
-          },
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          boxShadow: { xs: 'none', sm: '0 4px 24px rgba(0, 0, 0, 0.1)' },
-          margin: {
-            xs: 0,
-            sm: '20px auto',
-            md: 0
-          },
-          maxWidth: {
-            xs: '100%',
-            sm: '460px'
-          },
-        }}
-      >
-        <Typography 
-          variant="subtitle1" 
-          sx={{ 
-            color: '#333',
-            fontSize: '14px',
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 3,
+            textAlign: 'center',
             fontWeight: 600,
-            mb: 1,
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          WELCOME BACK!
-        </Typography>
-        <Typography 
-          variant="h4" 
-          sx={{ 
             color: '#333',
-            fontSize: '28px',
-            fontWeight: 600,
-            mb: 4,
-            fontFamily: "'Inter', sans-serif",
           }}
         >
-          Log In to your Account
+          Welcome Back
         </Typography>
 
-        <form onSubmit={handleLogin} style={{ width: '100%' }}>
-          <Typography sx={{ mb: 1, color: '#666', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Email</Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Type here..."
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                height: '48px',
-                backgroundColor: '#fff',
-                borderRadius: '8px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '15px',
-                '& fieldset': {
-                  borderColor: '#E5E5E5',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#999',
-                },
-              }
-            }}
-          />
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-          <Typography sx={{ mb: 1, color: '#666', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Password</Typography>
-          <TextField
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Type here..."
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleTogglePassword}
-                    edge="end"
-                    sx={{
-                      color: '#666',
-                      '&:hover': {
-                        color: '#333',
-                      },
-                    }}
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                height: '48px',
-                backgroundColor: '#fff',
-                borderRadius: '8px',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '15px',
-                '& fieldset': {
-                  borderColor: '#E5E5E5',
+        <form onSubmit={handleLogin}>
+          <Box sx={{ mb: 2 }}>
+            <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
+              Email
+            </Typography>
+            <TextField
+              fullWidth
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '6px',
+                  '& fieldset': {
+                    borderColor: '#E5E5E5',
+                  },
                 },
-                '&:hover fieldset': {
-                  borderColor: '#999',
-                },
-                '& .MuiInputAdornment-root': {
-                  marginRight: '4px',
-                },
-              }
-            }}
-          />
-
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            mb: 3 
-          }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  sx={{
-                    color: '#E5E5E5',
-                    '&.Mui-checked': {
-                      color: '#f44336',
-                    },
-                    width: '20px',
-                    height: '20px',
-                    marginRight: '8px',
-                  }}
-                />
-              }
-              label={
-                <Typography sx={{ fontSize: '14px', color: '#666', fontFamily: "'Inter', sans-serif" }}>
-                  Remember me
-                </Typography>
-              }
+              }}
             />
-            <Link 
-              onClick={() => setShowForgotPasswordPopup(true)}
-              sx={{ 
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
+              Password
+            </Typography>
+            <TextField
+              fullWidth
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '6px',
+                  '& fieldset': {
+                    borderColor: '#E5E5E5',
+                  },
+                },
+              }}
+            />
+          </Box>
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              mb: 2,
+              py: 1.5,
+              backgroundColor: '#F44336',
+              borderRadius: '6px',
+              textTransform: 'none',
+              fontSize: '16px',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#D32F2F',
+              },
+            }}
+          >
+            Login
+          </Button>
+
+          <Box sx={{ textAlign: 'center' }}>
+            <Link
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                // Add forgot password logic here
+              }}
+              sx={{
                 color: '#666',
+                textDecoration: 'none',
                 fontSize: '14px',
-                fontFamily: "'Inter', sans-serif",
-                cursor: 'pointer',
                 '&:hover': {
-                  color: '#f44336'
-                }
+                  color: '#333',
+                },
               }}
             >
               Forgot Password?
             </Link>
           </Box>
-
-          {error && (
-            <Typography color="error" sx={{ mb: 2, fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>
-              {error}
-            </Typography>
-          )}
-
-          <Button
-            type="submit"
-            fullWidth
-            sx={{
-              bgcolor: '#f44336',
-              color: 'white',
-              py: 1.5,
-              height: '48px',
-              mb: 3,
-              '&:hover': {
-                bgcolor: '#d32f2f'
-              },
-              textTransform: 'none',
-              fontSize: '16px',
-              fontWeight: 500,
-              borderRadius: '8px',
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-            Log In
-          </Button>
-
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Typography sx={{ color: '#666', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Or</Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={handleGoogleLogin}
-              sx={{
-                color: '#666',
-                borderColor: '#E5E5E5',
-                justifyContent: 'flex-start',
-                gap: '12px',
-                height: '48px',
-                pl: 2,
-                '&:hover': {
-                  borderColor: '#666',
-                  bgcolor: 'transparent'
-                },
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '15px',
-                borderRadius: '8px',
-                borderWidth: '1px',
-              }}
-            >
-              <img src={GoogleIcon} alt="Google" style={{ width: 24, height: 24 }} />
-              Log In with Google
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={handleFacebookLogin}
-              sx={{
-                color: '#666',
-                borderColor: '#E5E5E5',
-                justifyContent: 'flex-start',
-                gap: '12px',
-                height: '48px',
-                pl: 2,
-                '&:hover': {
-                  borderColor: '#666',
-                  bgcolor: 'transparent'
-                },
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '15px',
-                borderRadius: '8px',
-                borderWidth: '1px',
-              }}
-            >
-              <img src={FacebookIcon} alt="Facebook" style={{ width: 24, height: 24 }} />
-              Log In with Facebook
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={handleAppleLogin}
-              sx={{
-                color: '#666',
-                borderColor: '#E5E5E5',
-                justifyContent: 'flex-start',
-                gap: '12px',
-                height: '48px',
-                pl: 2,
-                '&:hover': {
-                  borderColor: '#666',
-                  bgcolor: 'transparent'
-                },
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '15px',
-                borderRadius: '8px',
-                borderWidth: '1px',
-              }}
-            >
-              <img src={AppleIcon} alt="Apple" style={{ width: 24, height: 24 }} />
-              Log In with Apple
-            </Button>
-          </Box>
-
-          <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Typography sx={{ fontSize: '14px', color: '#666', fontFamily: "'Inter', sans-serif" }}>
-              New User?{' '}
-              <Link 
-                href="/signup" 
-                underline="none" 
-                sx={{ 
-                  color: '#333',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  '&:hover': {
-                    color: '#f44336'
-                  }
-                }}
-              >
-                SIGN UP HERE
-              </Link>
-            </Typography>
-          </Box>
         </form>
-      </Box>
-
-      <PasswordPopup
-        open={showPasswordPopup}
-        onClose={() => {
-          setShowPasswordPopup(false);
-          setSocialLoginUser(null);
-        }}
-        onSubmit={handlePasswordSubmit}
-        email={socialLoginUser?.email || ''}
-      />
-
-      <ForgotPasswordPopup
-        open={showForgotPasswordPopup}
-        onClose={() => setShowForgotPasswordPopup(false)}
-      />
+      </Paper>
     </Box>
   );
 };

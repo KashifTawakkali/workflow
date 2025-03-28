@@ -1,55 +1,79 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import WorkflowList from './pages/WorkflowList';
-import WorkflowEditor from './pages/WorkflowEditor';
 import WorkflowBuilder from './pages/WorkflowBuilder';
-import theme from './theme/theme';
+import WorkflowEditor from './pages/WorkflowEditor';
 
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
+// Protected Route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  // Check if user is authenticated
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  
+  if (!isAuthenticated) {
+    // Redirect to login if not authenticated
+    return <Navigate to="/login" replace />;
   }
 
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  return <>{children}</>;
 };
 
-function App() {
+const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check authentication status when app loads
+    const checkAuth = () => {
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isLoading) {
+    return null; // or a loading spinner
+  }
+
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Navigate to="/workflows" replace />} />
-            <Route path="/workflows" element={<WorkflowList />} />
-            <Route path="/workflows/new" element={<WorkflowBuilder />} />
-            <Route path="/workflows/:id/edit" element={<WorkflowBuilder />} />
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/workflow/new"
-              element={
-                <PrivateRoute>
-                  <WorkflowEditor />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/workflow/:id"
-              element={
-                <PrivateRoute>
-                  <WorkflowEditor />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+    <Router>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Protected routes */}
+        <Route path="/workflows" element={
+          <ProtectedRoute>
+            <WorkflowList />
+          </ProtectedRoute>
+        } />
+        <Route path="/workflows/new" element={
+          <ProtectedRoute>
+            <WorkflowBuilder />
+          </ProtectedRoute>
+        } />
+        <Route path="/workflows/:id" element={
+          <ProtectedRoute>
+            <WorkflowEditor />
+          </ProtectedRoute>
+        } />
+        
+        {/* Default route - redirect to login or workflows based on auth status */}
+        <Route path="/" element={
+          localStorage.getItem('isAuthenticated') === 'true' 
+            ? <Navigate to="/workflows" replace />
+            : <Navigate to="/login" replace />
+        } />
+
+        {/* Catch all route - redirect to login or workflows */}
+        <Route path="*" element={
+          localStorage.getItem('isAuthenticated') === 'true'
+            ? <Navigate to="/workflows" replace />
+            : <Navigate to="/login" replace />
+        } />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App; 
