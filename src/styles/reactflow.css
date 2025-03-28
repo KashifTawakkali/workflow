@@ -1,0 +1,102 @@
+.react-flow__node {
+  border: none;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.react-flow__node.start-node,
+.react-flow__node.end-node {
+  width: 64px !important;
+  height: 64px !important;
+  background-color: transparent;
+}
+
+.react-flow__node.add-node {
+  width: 28px !important;
+  height: 28px !important;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.react-flow__node.workflow-node {
+  width: 200px !important;
+  height: 40px !important;
+  background-color: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+}
+
+.react-flow__node.workflow-node::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-color: #F44336;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.react-flow__node.workflow-node:hover::after {
+  opacity: 1;
+}
+
+.react-flow__edge path {
+  stroke: #E5E5E5;
+  stroke-width: 1.5;
+}
+
+.react-flow__edge-path {
+  stroke: #E5E5E5;
+  stroke-width: 1.5;
+}
+
+.react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.react-flow__background {
+  opacity: 0.15 !important;
+}
+
+.react-flow__controls {
+  display: none;
+}
+
+.react-flow__edge-textbg {
+  fill: none;
+}
+
+.react-flow__edge-text {
+  fill: none;
+}
+
+.react-flow__connection-path {
+  stroke: #E5E5E5;
+  stroke-width: 1.5;
+}
+
+.react-flow {
+  background-color: #FDF7F2;
+}
+
+.react-flow__edge-path {
+  marker-end: url(#react-flow__arrowclosed);
+}
+
+.react-flow__arrowclosed {
+  fill: #E5E5E5;
+} 
