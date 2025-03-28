@@ -191,11 +191,24 @@ const WorkflowBuilder = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeSelectorOpen, setNodeSelectorOpen] = useState(false);
-  const [selectedAddNodeId, setSelectedAddNodeId] = useState<string | null>(null);
-  const [nodeCount, setNodeCount] = useState(1);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-  const [configOpen, setConfigOpen] = useState(false);
+  const [showNodeSelector, setShowNodeSelector] = useState(false);
+  const [nodeSelectorPosition, setNodeSelectorPosition] = useState({ x: 0, y: 0 });
+  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [showEmailConfig, setShowEmailConfig] = useState(false);
+  const [nodeCount, setNodeCount] = useState(1);
+  const [executionHistory, setExecutionHistory] = useState<{
+    [nodeId: string]: {
+      status: 'passed' | 'failed';
+      timestamp: string;
+      method?: string;
+      url?: string;
+      headers?: string;
+      body?: string;
+      response?: any;
+      error?: string;
+    }[];
+  }>({});
 
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
@@ -204,23 +217,24 @@ const WorkflowBuilder = () => {
 
   const handleNodeClick = (event: React.MouseEvent, node: Node) => {
     if (node.type === 'add') {
-      setSelectedAddNodeId(node.id);
-      setNodeSelectorOpen(true);
+      setSelectedNode(node);
+      setShowNodeSelector(true);
+      setNodeSelectorPosition(node.position);
     } else if (node.type === 'default') {
       setSelectedNode(node);
-      setConfigOpen(true);
+      setShowApiConfig(true);
     }
   };
 
   const handleAddNode = (nodeType: string) => {
-    if (!selectedAddNodeId) return;
+    if (!selectedNode) return;
 
-    const addNode = nodes.find(n => n.id === selectedAddNodeId);
+    const addNode = nodes.find(n => n.id === selectedNode.id);
     if (!addNode) return;
 
     // Find the nodes above and below the add node
-    const incomingEdge = edges.find(e => e.target === selectedAddNodeId);
-    const outgoingEdge = edges.find(e => e.source === selectedAddNodeId);
+    const incomingEdge = edges.find(e => e.target === selectedNode.id);
+    const outgoingEdge = edges.find(e => e.source === selectedNode.id);
     const nodeAbove = nodes.find(n => n.id === incomingEdge?.source);
     const nodeBelow = nodes.find(n => n.id === outgoingEdge?.target);
 
@@ -255,7 +269,7 @@ const WorkflowBuilder = () => {
 
     // Update edges
     const newEdges = edges.filter(e => 
-      e.source !== selectedAddNodeId && e.target !== selectedAddNodeId
+      e.source !== selectedNode.id && e.target !== selectedNode.id
     );
 
     if (incomingEdge) {
@@ -290,7 +304,7 @@ const WorkflowBuilder = () => {
 
     // Update nodes
     const updatedNodes = nodes
-      .filter(n => n.id !== selectedAddNodeId)
+      .filter(n => n.id !== selectedNode.id)
       .concat([newNode, newAddNode]);
 
     // Adjust End node position if needed
@@ -307,8 +321,8 @@ const WorkflowBuilder = () => {
     setNodes(updatedNodes);
     setEdges(newEdges);
     setNodeCount(prev => prev + 1);
-    setNodeSelectorOpen(false);
-    setSelectedAddNodeId(null);
+    setShowNodeSelector(false);
+    setSelectedNode(null);
   };
 
   const handleSave = async () => {
@@ -354,9 +368,52 @@ const WorkflowBuilder = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
-  const handleCloseConfig = () => {
-    setConfigOpen(false);
-    setSelectedNode(null);
+  const handleApiCallExecutionComplete = (nodeId: string, result: {
+    status: 'passed' | 'failed';
+    method: string;
+    url: string;
+    headers: string;
+    body: string;
+    response?: any;
+    error?: string;
+  }) => {
+    setExecutionHistory(prev => ({
+      ...prev,
+      [nodeId]: [
+        {
+          ...result,
+          timestamp: new Date().toLocaleString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Kolkata'
+          }).replace(',', ' -') + ' IST'
+        },
+        ...(prev[nodeId] || [])
+      ]
+    }));
+
+    // Update node data to show execution status
+    setNodes(nds =>
+      nds.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              executionStatus: result.status,
+              lastExecution: {
+                ...result,
+                timestamp: new Date().toISOString()
+              }
+            }
+          };
+        }
+        return node;
+      })
+    );
   };
 
   return (
@@ -431,6 +488,7 @@ const WorkflowBuilder = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={handleNodeClick}
+          onPaneClick={() => setSelectedNode(null)}
           nodeTypes={nodeTypes}
           fitView
           style={{ background: '#FDF7F2' }}
@@ -454,28 +512,29 @@ const WorkflowBuilder = () => {
 
       {/* Node Selector Dialog */}
       <NodeSelector
-        open={nodeSelectorOpen}
-        onClose={() => setNodeSelectorOpen(false)}
+        open={showNodeSelector}
+        onClose={() => setShowNodeSelector(false)}
         onSelect={handleAddNode}
-        position={
-          selectedAddNodeId 
-            ? nodes.find(n => n.id === selectedAddNodeId)?.position || { x: 0, y: 0 }
-            : { x: 0, y: 0 }
-        }
+        position={nodeSelectorPosition}
       />
 
       {/* Configuration Dialogs */}
       {selectedNode && selectedNode.data.label === 'API Call' && (
         <ApiCallConfig
-          open={configOpen}
-          onClose={handleCloseConfig}
+          open={showApiConfig}
+          onClose={() => setShowApiConfig(false)}
           nodeId={selectedNode.id}
+          onExecutionComplete={
+            selectedNode
+              ? (result) => handleApiCallExecutionComplete(selectedNode.id, result)
+              : undefined
+          }
         />
       )}
       {selectedNode && selectedNode.data.label === 'Email' && (
         <EmailConfig
-          open={configOpen}
-          onClose={handleCloseConfig}
+          open={showEmailConfig}
+          onClose={() => setShowEmailConfig(false)}
           nodeId={selectedNode.id}
         />
       )}
