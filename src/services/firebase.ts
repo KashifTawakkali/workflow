@@ -21,6 +21,9 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Configure auth persistence
+auth.useDeviceLanguage();
+
 // Export services
 export { auth, db, analytics };
 

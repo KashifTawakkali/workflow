@@ -56,6 +56,12 @@ const Login = () => {
 
   const handleSocialLogin = async (provider: GoogleAuthProvider | FacebookAuthProvider | OAuthProvider) => {
     try {
+      // Add scopes for Google provider
+      if (provider instanceof GoogleAuthProvider) {
+        provider.addScope('profile');
+        provider.addScope('email');
+      }
+
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
@@ -67,11 +73,28 @@ const Login = () => {
         setSocialLoginUser(user);
         setShowPasswordPopup(true);
       } else {
-        // Existing user - proceed to workflows
-        navigate('/workflows');
+        // Check if password was previously set
+        const userData = userDoc.data();
+        if (!userData.hasPassword) {
+          // Show password popup if password hasn't been set
+          setSocialLoginUser(user);
+          setShowPasswordPopup(true);
+        } else {
+          // Password already set, proceed to workflows
+          navigate('/workflows');
+        }
       }
-    } catch (error) {
-      setError('Error signing in with social provider');
+    } catch (error: any) {
+      console.error('Social login error:', error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        setError('Login cancelled by user');
+      } else if (error.code === 'auth/popup-blocked') {
+        setError('Login popup was blocked. Please allow popups for this site');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorized for social login');
+      } else {
+        setError('Error signing in with social provider: ' + error.message);
+      }
     }
   };
 
@@ -81,27 +104,34 @@ const Login = () => {
         // Update user's password
         await updatePassword(socialLoginUser, newPassword);
         
-        // Store user data in Firestore
+        // Store user data in Firestore with password flag
         await setDoc(doc(db, 'users', socialLoginUser.uid), {
           email: socialLoginUser.email,
           displayName: socialLoginUser.displayName,
           photoURL: socialLoginUser.photoURL,
           createdAt: new Date().toISOString(),
-          provider: socialLoginUser.providerData[0].providerId
-        });
+          provider: socialLoginUser.providerData[0].providerId,
+          hasPassword: true // Add flag to indicate password is set
+        }, { merge: true }); // Use merge to update existing document
 
         // Close popup and navigate
         setShowPasswordPopup(false);
         setSocialLoginUser(null);
         navigate('/workflows');
       }
-    } catch (error) {
-      setError('Error setting password');
+    } catch (error: any) {
+      console.error('Password setup error:', error);
+      setError(error.message || 'Error setting password');
     }
   };
 
   const handleGoogleLogin = () => {
-    handleSocialLogin(new GoogleAuthProvider());
+    const provider = new GoogleAuthProvider();
+    // Add custom parameters for Google provider
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    handleSocialLogin(provider);
   };
 
   const handleFacebookLogin = () => {
