@@ -409,48 +409,9 @@ const WorkflowList = () => {
                   >
                     <TableCell 
                       sx={{ 
-                        width: '40px',
-                        p: 0,
-                        position: 'relative'
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        onClick={() => handleConfigClick(workflow.id)}
-                        sx={{
-                          position: 'absolute',
-                          left: 0,
-                          top: '50%',
-                          transform: 'translateY(-50%) rotate(-90deg)',
-                          transformOrigin: 'left center',
-                          minWidth: '120px',
-                          height: '32px',
-                          backgroundColor: workflow.configuration ? '#E3F2FD' : '#F5F5F5',
-                          color: workflow.configuration ? '#1976D2' : '#666',
-                          border: '1px solid',
-                          borderColor: workflow.configuration ? '#1976D2' : '#E5E5E5',
-                          textTransform: 'none',
-                          fontFamily: "'Inter', sans-serif",
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          borderRadius: '4px',
-                          boxShadow: 'none',
-                          '&:hover': {
-                            backgroundColor: workflow.configuration ? '#E3F2FD' : '#F5F5F5',
-                            borderColor: workflow.configuration ? '#1565C0' : '#666',
-                            boxShadow: 'none'
-                          }
-                        }}
-                      >
-                        Configuration
-                      </Button>
-                    </TableCell>
-                    <TableCell 
-                      sx={{ 
                         fontFamily: "'Inter', sans-serif",
                         fontSize: '14px',
-                        py: 2,
-                        pl: 5
+                        py: 2
                       }}
                     >
                       {workflow.name}

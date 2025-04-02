@@ -63,12 +63,12 @@ const initialEdges: Edge[] = [
     source: 'start',
     target: 'add-1',
     type: 'default',
-    style: { stroke: '#E5E5E5', strokeWidth: 1.5 },
+    style: { stroke: '#E5E5E5', strokeWidth: 1 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#E5E5E5',
-      width: 15,
-      height: 15,
+      width: 12,
+      height: 12,
     },
   },
   {
@@ -76,12 +76,12 @@ const initialEdges: Edge[] = [
     source: 'add-1',
     target: 'end',
     type: 'default',
-    style: { stroke: '#E5E5E5', strokeWidth: 1.5 },
+    style: { stroke: '#E5E5E5', strokeWidth: 1 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#E5E5E5',
-      width: 15,
-      height: 15,
+      width: 12,
+      height: 12,
     },
   },
 ];
@@ -91,35 +91,21 @@ const StartEndNode = ({ data }: { data: { label: string } }) => {
   return (
     <div
       style={{
-        width: 64,
-        height: 64,
+        width: 80,
+        height: 80,
         borderRadius: '50%',
         backgroundColor: isStart ? '#8BC34A' : '#F44336',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative',
-        border: `3px solid ${isStart ? '#8BC34A' : '#F44336'}`,
+        color: 'white',
+        fontSize: '16px',
+        fontWeight: 500,
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        border: 'none'
       }}
     >
-      <div
-        style={{
-          width: 'calc(100% - 8px)',
-          height: 'calc(100% - 8px)',
-          borderRadius: '50%',
-          border: '2px solid rgba(255, 255, 255, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '15px',
-          fontWeight: 500,
-          backgroundColor: 'transparent',
-          position: 'absolute',
-        }}
-      >
-        {data.label}
-      </div>
+      {data.label}
     </div>
   );
 };
@@ -128,34 +114,21 @@ const AddNode = ({ data }: { data: { label: string } }) => {
   return (
     <div
       style={{
-        width: 28,
-        height: 28,
+        width: 32,
+        height: 32,
         borderRadius: '50%',
-        border: '2px solid #E5E5E5',
         backgroundColor: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: '#666',
-        fontSize: '18px',
+        fontSize: '20px',
         cursor: 'pointer',
-        position: 'relative',
+        border: '1px solid #E5E5E5',
+        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)'
       }}
     >
-      <div
-        style={{
-          width: 'calc(100% - 4px)',
-          height: 'calc(100% - 4px)',
-          borderRadius: '50%',
-          border: '1px solid #E5E5E5',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'absolute',
-        }}
-      >
-        {data.label}
-      </div>
+      {data.label}
     </div>
   );
 };
@@ -163,6 +136,16 @@ const AddNode = ({ data }: { data: { label: string } }) => {
 const nodeTypes = {
   startEnd: StartEndNode,
   add: AddNode,
+};
+
+const defaultEdgeOptions = {
+  style: { stroke: '#E5E5E5', strokeWidth: 1 },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: '#E5E5E5',
+    width: 12,
+    height: 12,
+  },
 };
 
 const WorkflowBuilder = () => {
@@ -409,68 +392,51 @@ const WorkflowBuilder = () => {
   };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#FDF7F2' }}>
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: 2, 
-        p: 2, 
-        borderBottom: '1px solid #E5E5E5',
-        backgroundColor: 'white',
-        zIndex: 10
+        p: 2,
+        bgcolor: 'transparent'
       }}>
-        <IconButton 
+        <Button
+          startIcon={<KeyboardArrowLeft />}
           onClick={() => navigate(-1)}
           sx={{ 
-            color: '#666',
-            '&:hover': { color: '#333' }
+            color: '#333',
+            textTransform: 'none',
+            fontSize: '14px',
+            fontWeight: 500,
+            '&:hover': { bgcolor: 'transparent' }
           }}
         >
-          <KeyboardArrowLeft />
-        </IconButton>
-        <Typography variant="h6" sx={{ 
-          fontSize: '20px',
-          fontWeight: 500,
+          Go Back
+        </Button>
+        <Typography sx={{ 
+          ml: 2,
+          fontSize: '14px',
           color: '#333',
-          flex: 1
+          fontWeight: 500
         }}>
-          Edit Workflow
+          Untitled
         </Typography>
-        <Button
-          variant="contained"
-          color="error"
+        <IconButton 
           onClick={() => setSaveDialogOpen(true)}
-          sx={{
-            textTransform: 'none',
-            borderRadius: '4px',
-            mr: 1,
-            fontSize: '14px',
-            px: 2,
-            py: 1
+          sx={{ 
+            ml: 1,
+            color: '#666',
+            padding: '4px'
           }}
         >
-          Save Workflow
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          sx={{
-            textTransform: 'none',
-            borderRadius: '4px',
-            fontSize: '14px',
-            px: 2,
-            py: 1
-          }}
-        >
-          Exit Flow
-        </Button>
+          <ContentCopy fontSize="small" />
+        </IconButton>
       </Box>
 
       {/* Main Content */}
       <Box sx={{ 
         flex: 1, 
-        backgroundColor: '#FDF7F2',
+        bgcolor: '#FDF7F2',
         position: 'relative'
       }}>
         <ReactFlow
@@ -482,6 +448,7 @@ const WorkflowBuilder = () => {
           onNodeClick={handleNodeClick}
           onPaneClick={() => setSelectedNode(null)}
           nodeTypes={nodeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
           fitView
           style={{ background: '#FDF7F2' }}
           defaultViewport={{ x: 0, y: 0, zoom: zoom / 100 }}
@@ -495,11 +462,63 @@ const WorkflowBuilder = () => {
         >
           <Background 
             color="#E5E5E5" 
-            gap={24} 
-            size={1.5} 
-            style={{ opacity: 0.15 }} 
+            gap={20} 
+            size={1} 
+            style={{ opacity: 0.1 }} 
           />
         </ReactFlow>
+
+        {/* Zoom Controls - Bottom Right */}
+        <Box sx={{ 
+          position: 'absolute',
+          bottom: 24,
+          right: 24,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          bgcolor: 'white',
+          borderRadius: '4px',
+          padding: '4px',
+          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)'
+        }}>
+          <IconButton 
+            size="small"
+            onClick={() => setZoom(Math.max(zoom - 10, 50))}
+            sx={{ 
+              color: '#666',
+              '&:hover': { color: '#333' }
+            }}
+          >
+            -
+          </IconButton>
+          <Box sx={{ 
+            width: 120,
+            height: 2,
+            bgcolor: '#E5E5E5',
+            position: 'relative'
+          }}>
+            <Box sx={{
+              position: 'absolute',
+              left: `${((zoom - 50) / 150) * 100}%`,
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              bgcolor: '#8BC34A'
+            }} />
+          </Box>
+          <IconButton 
+            size="small"
+            onClick={() => setZoom(Math.min(zoom + 10, 200))}
+            sx={{ 
+              color: '#666',
+              '&:hover': { color: '#333' }
+            }}
+          >
+            +
+          </IconButton>
+        </Box>
       </Box>
 
       {/* Node Selector Dialog */}
@@ -530,61 +549,6 @@ const WorkflowBuilder = () => {
           nodeId={selectedNode.id}
         />
       )}
-
-      {/* Footer Controls */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        p: 2,
-        borderTop: '1px solid #E5E5E5',
-        backgroundColor: 'white',
-        zIndex: 10
-      }}>
-        {/* Zoom Controls */}
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center',
-          gap: 2
-        }}>
-          <IconButton 
-            sx={{ 
-              color: '#666',
-              '&:hover': { color: '#333' }
-            }}
-            onClick={() => setZoom(Math.max(zoom - 10, 50))}
-          >
-            -
-          </IconButton>
-          <Box sx={{ 
-            width: { xs: 100, sm: 200 },
-            height: 2,
-            backgroundColor: '#E5E5E5',
-            position: 'relative'
-          }}>
-            <Box sx={{
-              position: 'absolute',
-              left: `${((zoom - 50) / 150) * 100}%`,
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              backgroundColor: '#8BC34A',
-              cursor: 'pointer'
-            }} />
-          </Box>
-          <IconButton 
-            sx={{ 
-              color: '#666',
-              '&:hover': { color: '#333' }
-            }}
-            onClick={() => setZoom(Math.min(zoom + 10, 200))}
-          >
-            +
-          </IconButton>
-        </Box>
-      </Box>
 
       {/* Save Workflow Dialog */}
       <Dialog
