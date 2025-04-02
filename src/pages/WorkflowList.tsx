@@ -46,12 +46,6 @@ interface ExtendedWorkflow extends Workflow {
     headers?: string;
     body?: string;
   }[];
-  configuration?: {
-    method: string;
-    url: string;
-    headers: string;
-    body: string;
-  };
 }
 
 const WorkflowList = () => {
@@ -108,15 +102,6 @@ const WorkflowList = () => {
   };
 
   const handleExecute = (workflow: ExtendedWorkflow) => {
-    if (!workflow.configuration) {
-      // Show error message if not configured
-      setSnackbar({
-        open: true,
-        message: 'Please configure the workflow before executing',
-        severity: 'error'
-      });
-      return;
-    }
     setSelectedWorkflow(workflow);
     setShowExecuteModal(true);
   };
