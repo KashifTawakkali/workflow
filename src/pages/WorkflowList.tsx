@@ -66,7 +66,6 @@ const WorkflowList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [expandedWorkflow, setExpandedWorkflow] = useState<string | null>(null);
-  const [configuredWorkflow, setConfiguredWorkflow] = useState<string | null>(null);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -154,39 +153,6 @@ const WorkflowList = () => {
   const handleExpandClick = (workflowId: string | undefined) => {
     if (!workflowId) return;
     setExpandedWorkflow(expandedWorkflow === workflowId ? null : workflowId);
-  };
-
-  const handleConfigClick = (workflowId: string | undefined) => {
-    if (!workflowId) return;
-    setConfiguredWorkflow(workflowId);
-  };
-
-  const handleSaveConfiguration = (workflowId: string, config: any) => {
-    setWorkflows(workflows.map(w => {
-      if (w.id === workflowId) {
-        return {
-          ...w,
-          configuration: config,
-          executionHistory: [
-            {
-              date: new Date().toLocaleString('en-IN', {
-                day: '2-digit',
-                month: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-                timeZone: 'Asia/Kolkata'
-              }).replace(',', ' -') + ' IST',
-              status: 'passed',
-              ...config
-            },
-            ...(w.executionHistory || [])
-          ]
-        };
-      }
-      return w;
-    }));
-    setConfiguredWorkflow(null);
   };
 
   const filteredWorkflows = workflows.filter(workflow =>
@@ -748,158 +714,6 @@ const WorkflowList = () => {
           Delete
         </MenuItem>
       </Menu>
-
-      <Dialog
-        open={configuredWorkflow !== null}
-        onClose={() => setConfiguredWorkflow(null)}
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            width: { xs: '90%', sm: '480px' },
-            p: 0,
-            m: { xs: 2, sm: 0 }
-          }
-        }}
-      >
-        <Box sx={{ p: 3 }}>
-          <Typography sx={{ 
-            fontSize: '18px',
-            color: '#333',
-            fontWeight: 600,
-            mb: 3
-          }}>
-            Configuration
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Box>
-              <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
-                Method
-              </Typography>
-              <TextField
-                select
-                fullWidth
-                defaultValue="GET"
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: '#E5E5E5',
-                    },
-                  },
-                }}
-              >
-                <MenuItem value="GET">GET</MenuItem>
-                <MenuItem value="POST">POST</MenuItem>
-                <MenuItem value="PUT">PUT</MenuItem>
-                <MenuItem value="DELETE">DELETE</MenuItem>
-              </TextField>
-            </Box>
-            <Box>
-              <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
-                URL
-              </Typography>
-              <TextField
-                fullWidth
-                placeholder="Type here.."
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: '#E5E5E5',
-                    },
-                  },
-                }}
-              />
-            </Box>
-            <Box>
-              <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
-                Headers
-              </Typography>
-              <TextField
-                fullWidth
-                placeholder="Header Name"
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: '#E5E5E5',
-                    },
-                  },
-                }}
-              />
-            </Box>
-            <Box>
-              <Typography sx={{ mb: 1, fontSize: '14px', color: '#333' }}>
-                Body
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                placeholder="Enter Descriptions..."
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: '#E5E5E5',
-                    },
-                  },
-                }}
-              />
-            </Box>
-          </Box>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'flex-end',
-            gap: 2,
-            mt: 3
-          }}>
-            <Button
-              onClick={() => setConfiguredWorkflow(null)}
-              sx={{
-                color: '#666',
-                textTransform: 'none',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '14px',
-                fontWeight: 500,
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                  color: '#333',
-                }
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                const config = {
-                  method: 'GET',
-                  url: 'https://api.example.com',
-                  headers: '{}',
-                  body: ''
-                };
-                if (configuredWorkflow) {
-                  handleSaveConfiguration(configuredWorkflow, config);
-                }
-              }}
-              variant="contained"
-              sx={{
-                bgcolor: '#1A1A1A',
-                color: 'white',
-                textTransform: 'none',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '14px',
-                fontWeight: 500,
-                borderRadius: '6px',
-                '&:hover': {
-                  bgcolor: '#000'
-                }
-              }}
-            >
-              Save
-            </Button>
-          </Box>
-        </Box>
-      </Dialog>
 
       <Snackbar
         open={snackbar.open}

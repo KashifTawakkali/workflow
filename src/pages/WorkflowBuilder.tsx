@@ -429,6 +429,17 @@ const WorkflowBuilder = () => {
             padding: '4px'
           }}
         >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.7 0H1.3C0.58 0 0 0.58 0 1.3V14.7C0 15.42 0.58 16 1.3 16H14.7C15.42 16 16 15.42 16 14.7V3.3L12.7 0ZM8 14.7C6.58 14.7 5.3 13.42 5.3 12C5.3 10.58 6.58 9.3 8 9.3C9.42 9.3 10.7 10.58 10.7 12C10.7 13.42 9.42 14.7 8 14.7ZM11.3 6H1.3V1.3H11.3V6Z" fill="currentColor"/>
+          </svg>
+        </IconButton>
+        <IconButton 
+          sx={{ 
+            ml: 1,
+            color: '#666',
+            padding: '4px'
+          }}
+        >
           <ContentCopy fontSize="small" />
         </IconButton>
       </Box>
